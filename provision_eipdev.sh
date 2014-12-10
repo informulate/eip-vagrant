@@ -1,11 +1,20 @@
 #!/bin/bash
 echo "Informulate is provisioning your box for eip.dev/oauth.dev"
+sudo yum update kernel* -y /dev/null
+
+echo "Downloading VBoxGuestAdditions..."
+#wget -Nq -O ~/VBoxGuestAdditions_4.3.8.iso http://download.virtualbox.org/virtualbox/4.3.20/VBoxGuestAdditions_4.3.20.iso 
+sudo mount -t iso9660 -o loop VBoxGuestAdditions_4.3.8.iso /mnt/
+
+echo "Downloading EPEL and installing it..."
+#wget -Nq http://download.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
+sudo rpm -ivh epel-release-6-8.noarch.rpm
+export KERN_DIR=/usr/src/kernels/`uname -r`
 
 echo "Installing Git..."
 sudo yum install git -y > /dev/null
 
 echo "Git cloning eip.dev & oauth.dev into /var/www/html. Let git.assembla.com git clone automatically..."
-echo "git.assembla.com,64.250.188.42 ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEAr06hg4ep5IKc85rjYZkEmer+BMkpLfsYi7iOMWytiqyow0jqMiVg7t32a4WW0349QV4rmfcMg5ULuIP//mBjSb2G1jSmqPvWx4JCzZLKu3nmsx1YdBWmVvn/qyVLQ5E+NCSkJJORKqIIgiL1WuAEaxUODYmBExwv1eMZWBpyeKZrrsBEmogKt2Q+igQ31+rb1fQI9/hDE+SktOpT9sWJ9brSDgsQNXAtV52DFDA8mzq7FL+4TbLjDoDdK7v3LFYn2cnN2kD57gW8qvP6V6mrkjc6I2aCNBHwdcIynUQ8HKdU+Sd4u7pZsCCK7odgPCcM5Jj+/PladSR8+DCtvs6JWw==" > ~/.ssh/known_hosts
 git clone git@git.assembla.com:eiprewrite.client.git -b develop ~/eip.dev
 git clone git@git.assembla.com:eiprewrite.server.git -b develop ~/oauth.dev
 
@@ -26,8 +35,8 @@ sudo yum install php-pecl-apc -y /dev/null
 echo "Restarting Apache..."
 sudo /etc/init.d/httpd restart
 
-echo "Importing the RPMforge GPG Key..."
-yum install -y phpmyadmin
+echo "Installing phpMyAdmin..."
+sudo yum install -y phpmyadmin
 
 echo "Installing MySQL..."
 sudo yum install mysql -y /dev/null
@@ -35,3 +44,4 @@ sudo yum install mysql-server -y /dev/null
 echo "Creating the system startup links for MySQL and start MySQL server:"
 sudo chkconfig --levels 235 mysqld on
 sudo /etc/init.d/mysqld start
+
